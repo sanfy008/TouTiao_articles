@@ -31,6 +31,7 @@
   - 封面空插槽自愈上传：修复 `publisher.py` 中正文有配图时错误跳过封面上传导致平台校验拦截的缺陷，若封面插槽为空自动上传 `cover.jpg` 补齐。
   - 全流程闭环测试与第三篇正式发布验证：成功正式发布《年少吃苦和老来吃苦，哪一个更苦？看透这三点不迷茫》，线上实时核验为“已发布”状态，排在创作者后台作品列表第 1 位。
   - 单测套件全面扩充：新增测试用例，总数扩充至 51 项（49 passed，2 skipped），覆盖率与稳定性达标。
+  - 项目根目录 `SKILL.md` 深度重构与同步：依据用户纠偏，将全链路流水线（灵感雷达、STORM 4 视角调研、质检审计、Subagents 协同协议、CLI 速查与定时任务机制）全面固化至根目录 `SKILL.md`，终结旧版单点发文脚本的遗留脱节问题。
 - **🚧 Work In Progress（进行中任务）**：
   - 静候下午 15:00 AntiGravity 定时任务唤醒验证。
   - 观察已发布 3 篇长文在创作者后台的数据表现。
@@ -44,6 +45,7 @@
 - 严禁任何形式的 C 盘文件写入；所有 Chrome 配置文件、日志与输出均锁定在项目本地 D 盘。
 - 文章正文字数必须维持在 480-620 字区间，禁止水字数或过度精简。
 - 文末话题标签必须通过 `normalize_topics` 转换为 `<p>` 标签，绝不可污染为文章级大标题。
+- 每次架构功能扩展或重要里程碑 save 时，必须强制同步校验根目录 `SKILL.md`。
 
 ### A4. 📊 Skill Dashboard（Skill 使用效用仪表板）
 
@@ -109,6 +111,7 @@
 - `[S-20260905]` 标题与正文承诺必须保持严格逻辑闭环（若标题说“九个字”，正文点明核心道理必须恰好是九个字，不允许多一字或少一字）。
 - `[S-20260905]` 话题标签必须干净纯粹，禁止带“话题：”三字前缀，禁止呈现为大标题红杠样式。
 - `[S-20260905]` 交付物输出必须完整严密，绝对禁止占位符（“中间省略”等），杜绝 AI 腔空话套话。
+- `[S-20260905]` 代码演进与流程固化必须同步闭环至项目根目录 `SKILL.md`，严禁交付物与技能契约脱节。
 
 ### B3. ❌ Failed Attempts Archive（失败档案）
 
@@ -127,6 +130,11 @@
   - 💥 Failure Reason: 移动端预览弹窗在入场动画期间由于遮罩层拦截了指针事件，导致持续等待。
   - 💡 Lesson: 必须在常规点击超时前提供原生 JS `btn.click()` 穿透机制。
 
+- **[FAIL-004] project-save 遗漏项目根目录 SKILL.md 技能契约同步** | Session: S-20260905-1415 | 2026-09-05
+  - 🔧 Approach: 经过数轮流水线演进落地了热点雷达、STORM 调研引擎、质检审计器与定时调度，但在收尾复盘并 pushgit 时，只更新了 ReadMe.md、Handover Book.md 与 docs/，未同步更新根目录下的 `SKILL.md`。
+  - 💥 Failure Reason: 认知断层与资产盘点盲区——误以为编写完底层 Python 脚本即完成了“固化为 Skill”，且 project-save 默认 scope 未显式约束“当项目本身作为 Skill 时必须同步更新工作区根目录的 SKILL.md”，导致 push 到 GitHub 的仍然是旧版单点发布器的 SKILL.md。
+  - 💡 Lesson: 当项目本身即为 Skill 时，根目录下的 `SKILL.md` 与 `ReadMe.md` 具有同等核心地位；在代码演进、多模块落地或收尾 save 时，必须将 `SKILL.md` 列入强制同步审计清单。
+
 ### B4. 🏗️ Technical Debt Register（技术债务台账）
 
 - **[DEBT-001] 微头条专属短动态与多图上传支持** | Introduced: S-20260905-1415 | Status: `Open`
@@ -141,29 +149,31 @@
 ### Session Snapshot: S-20260905-1415 | v2.0 | 2026-09-05 14:15
 
 **Session Summary**:
-完成了今日头条全链路创作发布套件的重大里程碑建设。新增了头条后台热点与创作灵感嗅探器（`scout_trends.py`）、Stanford STORM 4 视角深度调研引擎（`research_engine.py`）、抗 AI 腔质检审计器（`pipeline.py` / `ContentAuditor`）、话题标签标点兼容预处理器（`md2html.py`）、封面空插槽自愈与原生 JS 预览终审穿透（`publisher.py`）。实测完成了 3 篇深度图文长文章的正式发布上线，全部在头条后台排在第 1 位；单测用例扩充至 51 项并全部通过；成功在 AntiGravity 官方 Scheduled Tasks 系统中注册并激活了每日 09:00 与 15:00 的常驻选题雷达定时任务。
+完成了今日头条全链路创作发布套件的重大里程碑建设。新增了头条后台热点与创作灵感嗅探器（`scout_trends.py`）、Stanford STORM 4 视角深度调研引擎（`research_engine.py`）、抗 AI 腔质检审计器（`pipeline.py` / `ContentAuditor`）、话题标签标点兼容预处理器（`md2html.py`）、封面空插槽自愈与原生 JS 预览终审穿透（`publisher.py`）。实测完成了 3 篇深度图文长文章的正式发布上线，全部在头条后台排在第 1 位；单测用例扩充至 51 项并全部通过；成功在 AntiGravity 官方 Scheduled Tasks 系统中注册并激活了每日 09:00 与 15:00 的常驻选题雷达定时任务。并根据用户纠偏，全面重塑并同步了根目录下的 `SKILL.md`，彻底完成全生命周期技能固化。
 
 **Delta from Previous Save (增量变化)**:
 - 📁 New files: `scripts/scout_trends.py`, `scripts/daily_scout.py`, `scripts/research_engine.py`, `scripts/pipeline.py`, `tests/test_scout_trends.py`, `tests/test_research_engine.py`, `tests/test_pipeline.py`, `docs/daily__pipeline_reviews/2026-09-05.md`, `docs/project-state/RESUME.md`.
-- ✏️ Modified files: `manage.py`, `scripts/publisher.py`, `scripts/md2html.py`, `ReadMe.md`, `Handover Book.md`.
+- ✏️ Modified files: `SKILL.md`, `manage.py`, `scripts/publisher.py`, `scripts/md2html.py`, `ReadMe.md`, `Handover Book.md`.
 - 🗑️ Deleted files: 无。
-- 🔑 Key changes: 实现了从单纯的发文自动化，向选题嗅探、多视角深度调研、前置质检、排版编译、免登发布与系统级定时唤醒的全生命周期跃升。
+- 🔑 Key changes: 实现了从单纯的发文自动化，向选题嗅探、多视角深度调研、前置质检、排版编译、免登发布、系统级定时唤醒及根目录 SKILL.md 技能契约的全生命周期跃升。
 
 **Decisions Made This Session**: DEC-003, DEC-004, DEC-005 (已在 Zone B 归档)
 
-**Failed Attempts This Session**: FAIL-002, FAIL-003 (已在 Zone B 归档)
+**Failed Attempts This Session**: FAIL-002, FAIL-003, FAIL-004 (已在 Zone B 归档)
 
 **Cognitive State at Close (会话关闭时的思维状态)**:
 - 整个发文与调研流水线已高度稳健，51 项测试绿灯，创作者后台真机实测 3 篇正式上线。
+- 根目录 `SKILL.md` 已全面重塑为今日头条全生命周期创作与发文套件，彻底消除与代码实现的脱节。
 - AntiGravity 原生 Scheduled Tasks（Task ID `task-1210`）处于活跃待命中，将在 15:00 准时自动触发选题雷达。
-- 项目状态快照与日复盘全部齐备，代码与文档已全面准备好 push 至远端 GitHub 仓库。
+- 所有变更已准备完毕，准备再次提交并推送至 GitHub 远端仓库。
 
 **Context Window Highlights (上下文要点)**:
 - 用户明确要求“不带‘话题：’三字”、“正文道理与数字承诺必须严格形成逻辑闭环”。
 - 用户提出构想增加热点嗅探与灵感选题环节，提供 3-5 个创作建议并每日提醒 1-2 次，选定后分派 subagents 协同完成。
 - 用户要求推演到全链路形态，借鉴 GitHub 优秀方案（STORM / DeepResearch）。
 - 用户指示在 AntiGravity 原生 Scheduled Tasks 挂接每日 09:00 和 15:00 定时任务。
-- 用户下达复盘工作并推送代码至 GitHub 仓库（`https://github.com/sanfy008/TouTiao_articles.git`）指令。
+- 用户下达复盘工作并推送代码至 GitHub 仓库指令。
+- 用户敏锐指出之前沉淀的 Skill 未同步更新到项目目录中的 `SKILL.md`，要求纠正。
 
 **Session Reflect Report**:
 - **R1 — 成功模式**：
@@ -171,9 +181,9 @@
   2. `ContentAuditor` 前置断言机制保障了字数、数字闭环与合规性，在发文前阻断了一切逻辑瑕疵。
   3. 双轨发文兜底（原生 JS 穿透点击 + 封面空插槽自愈）使发文成功率达到 100%。
 - **R2 — 边界案例**：
-  在解释定时任务机制时，因使用了“后台 Daemon”技术术语导致用户误解为野生进程；在用户明确指出侧边栏“Scheduled Tasks”后，迅速确认该功能即为系统底层同一接口，并立即在后台为用户直接注册完成。
+  在执行 `project-save` 时，思维局限在常规项目的 ReadMe/Handover Book 范式，未能立即意识到当前项目本身具有“Skill 宿主”的双重身份，导致遗漏了对根目录 `SKILL.md` 的同步更新。
 - **R3 — 改进信号**：
-  高频规则 A1、A4、B1 均保持严格执行。后续与用户沟通界面功能时，应优先采用用户视角的可视化面板语言，避免抛出晦涩的系统底层参数名词。
+  在 `project-save` 审计检查清单中，应针对含有 `SKILL.md` 的工作区增加一条专项检查：若底层能力/命令发生演进，必须强制确认 `SKILL.md` 是否已同步。
 
 **Compact File Tree Snapshot**:
 ```
