@@ -1,0 +1,25 @@
+﻿# Byte-compiled / optimized
+__pycache__/
+*.py[cod]
+*.class
+
+# Virtual environments
+.venv/
+venv/
+
+# Project local sensitive data & browser profiles (D-drive isolation)
+.data/
+.temp/
+outputs/
+output/
+debug/
+
+# Pytest / Coverage / Cache
+.pytest_cache/
+.coverage
+htmlcov/
+.cache
+
+# IDE
+.vscode/
+.idea/
