@@ -1,6 +1,6 @@
 # Handover Book - Toutiao Publishing Suite & AI Creative Engine
 
-> **当前版本**：`v2.0` | **当前 Session**：`S-20260905-1415` | **最新日复盘**：[2026-09-05.md](docs/daily__pipeline_reviews/2026-09-05.md)
+> **当前版本**：`v2.1` | **当前 Session**：`S-20260905-2230` | **最新日复盘**：[2026-09-05.md](docs/daily__pipeline_reviews/2026-09-05.md)
 
 ---
 
@@ -28,13 +28,14 @@
   - 全链路协同发布管线与质检审计器（Pipeline & ContentAuditor）：落地 `scripts/pipeline.py`，内置 `ContentAuditor` 对字数区间（480-620纯汉字）、标题与结论数字逻辑一致性、去 AI 腔套话黑名单、话题标签规范性进行前置硬性断言校验。
   - 话题标签含标点编译器防降级：升级 `scripts/md2html.py` 中 `HASHTAG_LINE_PATTERN` 正则为 `re.compile(r"^#[^#\s
 ]+#")`，完美兼容含标点的热点话题标签。
-  - 封面空插槽自愈上传：修复 `publisher.py` 中正文有配图时错误跳过封面上传导致平台校验拦截的缺陷，若封面插槽为空自动上传 `cover.jpg` 补齐。
+  - 封面空插槽自愈上传：修复 `publisher.py` 中正文有配图时若封面插槽为空自动上传 `cover.jpg` 补齐的兜底机制，杜绝平台校验拦截。
   - 全流程闭环测试与第三篇正式发布验证：成功正式发布《年少吃苦和老来吃苦，哪一个更苦？看透这三点不迷茫》，线上实时核验为“已发布”状态，排在创作者后台作品列表第 1 位。
-  - 单测套件全面扩充：新增测试用例，总数扩充至 51 项（49 passed，2 skipped），覆盖率与稳定性达标。
-  - 项目根目录 `SKILL.md` 深度重构与同步：依据用户纠偏，将全链路流水线（灵感雷达、STORM 4 视角调研、质检审计、Subagents 协同协议、CLI 速查与定时任务机制）全面固化至根目录 `SKILL.md`，终结旧版单点发文脚本的遗留脱节问题。
+  - 第四篇正式发布上线：成功发布《取消英语主科，无异于自断一臂》（正文 606 纯汉字，首屏插图，头条首发声明与个人观点声明完备），创作者中心实时展示为“已发布”。
+  - 目录结构规范化与自动化单测补齐：修正 `pipeline.py` 的目录生成逻辑为标准 `articles/MM/DD/`，补齐 `test_prepare_article_directory_structure` 单测，单测总用例扩增至 52 项（50 passed，2 skipped）。
+  - 全库代码审查与卫生清理：消除裸 `except:`、未使用的导入（unused imports）与冗余 f-strings，更新项目根目录 `SKILL.md` 契约。
 - **🚧 Work In Progress（进行中任务）**：
-  - 静候下午 15:00 AntiGravity 定时任务唤醒验证。
-  - 观察已发布 3 篇长文在创作者后台的数据表现。
+  - 持续观察已发布 4 篇长文在创作者后台的阅读推流与数据反馈。
+  - 监控 AntiGravity 每日 09:00 与 15:00 定时选题雷达执行状态。
 - **🧱 Active Blockers（当前阻塞项）**：无。
 - **🗂️ Latest Daily Review（最近一份日复盘）**：`docs/daily__pipeline_reviews/2026-09-05.md`
 - **🚀 Next Prompt Recommendations（下一轮 Prompt 建议）**：
@@ -145,6 +146,72 @@
 ---
 
 ## Zone C — Session Archive
+
+### Session Snapshot: S-20260905-2230 | v2.1 | 2026-09-05 22:30
+
+**Session Summary**:
+完成了对今日头条创作发布套件的全量代码审查、架构规范与工程质量优化。识别并修复了最新发文过程中产生的封面空插槽自愈逻辑退化，确保文章有插图时若平台未自动抓取展示封面能可靠回退上传同目录 `cover.jpg`；修正了 `pipeline.py` 中 `prepare_article_directory` 的月份格式偏差为标准的 `MM/DD` 并新增单测；全面消除了仓库中潜在阻断中断信号的裸 `except:`、未使用的模块导入与冗余 f-strings；将第 4 篇正式发文《取消英语主科，无异于自断一臂》完整归档至资产台账中；单测套件扩增至 52 项全部通过，同步核准根目录 `SKILL.md` 契约。
+
+**Delta from Previous Save (增量变化)**:
+- 📁 New files: `articles/09/05/取消英语主科_无异于自断一臂/`。
+- ✏️ Modified files: `scripts/publisher.py`, `scripts/pipeline.py`, `scripts/browser_utils.py`, `scripts/daily_scout.py`, `scripts/fetch_articles.py`, `scripts/research_engine.py`, `scripts/scout_trends.py`, `scripts/setup_environment.py`, `tests/test_pipeline.py`, `tests/test_auth_manager.py`, `tests/test_research_engine.py`, `tests/test_scout_trends.py`, `tests/test_run.py`, `SKILL.md`, `README.md`, `Handover Book.md`, `docs/daily__pipeline_reviews/2026-09-05.md`, `docs/project-state/RESUME.md`。
+- 🗑️ Deleted files: 无。
+- 🔑 Key changes: 恢复封面自愈上传双轨防线，修正目录命名一致性并补齐自动化单测，优化全库工程代码卫生。
+
+**Decisions Made This Session**: 无新增架构决策（维持 DEC-001~005 既有架构与规范）。
+
+**Failed Attempts This Session**: 无（本 Session 无新增错误，成功修复了历史潜在退化）。
+
+**Cognitive State at Close (会话关闭时的思维状态)**:
+- 全量 52 项单测全部绿灯（50 passed，2 skipped），无破坏性变更。
+- 代码库清洁度显著提升，无裸 `except:`，未用 import 全部清除。
+- 正式发文篇目增至 4 篇，台账、日复盘与恢复卡保持 100% 同步。
+
+**Context Window Highlights (上下文要点)**:
+- 用户指示“按照你的审查结论，对项目进行必要的优化修复”。
+- 严格遵循审查清单落实 P0（封面自愈）、P1（目录规范与单测）、P1（台账同步）与 P2（代码卫生）整改。
+
+**Session Reflect Report**:
+- **R1 — 成功模式**：
+  在代码修改完成后立即运用 `ruff check` 与 `pytest` 双重工具进行验证，不仅快速锁定了未被测试覆盖的盲区，而且以高标准清除了工程异味。
+- **R2 — 边界案例**：
+  在 `pipeline.py` 中修改 `prepare_article_directory` 时，设计了 `base_dir: Optional[Path] = None` 参数，使得单测可以在 `tmp_path` 下做沙箱隔离测试，避免单测在真实 `articles/` 目录中产生垃圾测试数据。
+- **R3 — 改进信号**：
+  后续应将自动化代码 Lint 与格式检查集成至 `manage.py` 或预检脚本中，防止轻微代码异味在迭代过程中再次累积。
+
+**Compact File Tree Snapshot**:
+```
+10-Toutiao/
+├── manage.py
+├── requirements.txt
+├── SKILL.md
+├── ReadMe.md
+├── Handover Book.md
+├── articles/
+│   ├── 09/04/带孩子见世面_是普通家庭最贵的自欺欺人/
+│   └── 09/05/
+│       ├── 连广州这些老字号都撑不住了_普通人挣钱有多难/
+│       ├── 老了什么是你的底气_其实不过这九个字/
+│       ├── 年少吃苦和老来吃苦_哪一个更苦_看透这三点不迷茫/
+│       └── 取消英语主科_无异于自断一臂/
+├── docs/
+│   ├── daily__pipeline_reviews/2026-09-05.md
+│   └── project-state/RESUME.md
+├── scripts/
+│   ├── publisher.py
+│   ├── auth_manager.py
+│   ├── browser_utils.py
+│   ├── scout_trends.py
+│   ├── daily_scout.py
+│   ├── research_engine.py
+│   ├── pipeline.py
+│   ├── md2html.py
+│   ├── fetch_articles.py
+│   ├── config.py
+│   ├── run.py
+│   └── setup_environment.py
+└── tests/ (52 tests)
+```
 
 ### Session Snapshot: S-20260905-1415 | v2.0 | 2026-09-05 14:15
 

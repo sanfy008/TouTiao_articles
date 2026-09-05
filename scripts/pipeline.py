@@ -9,9 +9,7 @@ Orchestrates:
 5. Subagent 4: Typesetting & Automation (Markdown normalization & Playwright publishing)
 """
 
-import os
 import sys
-import json
 import re
 import time
 import shutil
@@ -27,9 +25,7 @@ if hasattr(sys.stderr, "reconfigure"):
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 
-from config import DATA_DIR, BROWSER_PROFILE_DIR, STATE_FILE
 from research_engine import ResearchEngine
-from scout_trends import scout_trends
 
 
 class ContentAuditor:
@@ -120,20 +116,26 @@ class ContentAuditor:
         return len(issues) == 0, issues, metrics
 
 
-def prepare_article_directory(title: str, content: str, cover_source: Optional[str] = None) -> Path:
+def prepare_article_directory(
+    title: str,
+    content: str,
+    cover_source: Optional[str] = None,
+    base_dir: Optional[Path] = None,
+) -> Path:
     """
     Sets up the standardized directory structure:
-    articles/YYYY-MM/DD/Title/
+    articles/MM/DD/Title/
     - article.md
     - cover.jpg
     """
     now = time.localtime()
-    month_dir = f"{now.tm_year}-{now.tm_mon:02d}"
+    month_dir = f"{now.tm_mon:02d}"
     day_dir = f"{now.tm_mday:02d}"
-    
+
     # Clean title for directory name (remove special characters)
     clean_dir_name = re.sub(r'[\\/:*?"<>|#\s]', '_', title)[:30].strip('_')
-    target_dir = PROJECT_ROOT / "articles" / month_dir / day_dir / clean_dir_name
+    root = base_dir if base_dir is not None else (PROJECT_ROOT / "articles")
+    target_dir = root / month_dir / day_dir / clean_dir_name
     target_dir.mkdir(parents=True, exist_ok=True)
 
     article_path = target_dir / "article.md"

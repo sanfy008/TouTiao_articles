@@ -1,4 +1,3 @@
-import pytest
 from scripts.scout_trends import parse_metric_to_number, format_heat
 
 

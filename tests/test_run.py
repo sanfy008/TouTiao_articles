@@ -113,7 +113,7 @@ class RunnerEnvironmentTest(unittest.TestCase):
             patch.object(sys, "argv", ["run.py", "publisher.py", "--json"]),
             patch("run.ensure_venv", return_value=Path(sys.executable)),
             patch("run.subprocess.Popen", return_value=process) as popen,
-            self.assertRaises(SystemExit) as raised,
+            self.assertRaises(SystemExit),
         ):
             run.main()
 

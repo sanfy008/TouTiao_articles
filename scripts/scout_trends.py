@@ -4,13 +4,12 @@ Toutiao Inspiration & Hotspot Scout (创作灵感与热点嗅探引擎)
 Scrapes trending topics and creator incentives from Toutiao Creator Console.
 """
 
-import os
 import sys
 import json
 import re
 import time
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 # Fix Windows console UTF-8 encoding
 if hasattr(sys.stdout, "reconfigure"):
@@ -21,7 +20,7 @@ if hasattr(sys.stderr, "reconfigure"):
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 
-from config import DATA_DIR, BROWSER_PROFILE_DIR, STATE_FILE, BROWSER_ARGS
+from config import BROWSER_PROFILE_DIR, STATE_FILE
 from browser_utils import BrowserFactory
 
 HOTSPOT_URL = "https://mp.toutiao.com/profile_v4/activity/hot-spot"
@@ -136,7 +135,7 @@ def extract_tasks_from_page(page) -> List[Dict[str, Any]]:
 
     tasks = []
     for text in raw_tasks:
-        lines = [l.strip() for l in text.splitlines() if l.strip()]
+        lines = [line_item.strip() for line_item in text.splitlines() if line_item.strip()]
         if lines:
             tasks.append({
                 "title": lines[0],

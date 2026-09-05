@@ -1,6 +1,6 @@
 # Toutiao Publishing Suite & AI Creative Engine
 
-> **版本**：`v2.0` | **状态**：✅ `Stable` | **最新日复盘**：[2026-09-05.md](docs/daily__pipeline_reviews/2026-09-05.md)
+> **版本**：`v2.1` | **状态**：✅ `Stable` | **最新日复盘**：[2026-09-05.md](docs/daily__pipeline_reviews/2026-09-05.md)
 
 Toutiao Publishing Suite 是一个基于 **Playwright / Patchright** 的工业级自动化创作与发布套件。它不仅实现了头条创作者中心及其 ProseMirror 富文本编辑器的精准注入与持久化免登发布，更贯通了从热点灵感嗅探、Stanford STORM 多视角深度调研、AI 腔质检硬性断言、16:9 高清插图生成到 AntiGravity 原生定时任务唤醒的全生命周期自动化闭环。
 
@@ -72,7 +72,7 @@ python manage.py setup
 # 2. 校验登录态是否在线有效
 python manage.py status --verify
 
-# 3. 运行完整测试套件（51 项单测全部通过）
+# 3. 运行完整测试套件（52 项单测全部通过）
 python -m pytest
 ```
 
@@ -106,7 +106,7 @@ python manage.py list --tab draft
 ├── Handover Book.md            # 项目交接账本与决策档案（Zone A/B/C）
 ├── articles/                   # 正式产出归档目录（按 articles/MM/DD/篇名/ 存储）
 │   ├── 09/04/                  # 9月4日发文（《带孩子“见世面”》）
-│   └── 09/05/                  # 9月5日发文（《连广州老字号》《老了什么是你的底气》《年少吃苦老来吃苦》）
+│   └── 09/05/                  # 9月5日发文（《连广州老字号》《老了什么是你的底气》《年少吃苦老来吃苦》《取消英语主科》）
 ├── docs/
 │   ├── daily__pipeline_reviews/# 每日流水线闭环复盘（如 2026-09-05.md）
 │   └── project-state/          # 下一会话恢复卡（RESUME.md）
@@ -123,20 +123,30 @@ python manage.py list --tab draft
 │   ├── config.py               # 路径沙箱化与常量配置
 │   ├── run.py                  # 运行兼容适配层
 │   └── setup_environment.py    # 虚拟环境与依赖管理
-└── tests/                      # 单元测试套件（51 项用例）
+└── tests/                      # 单元测试套件（52 项用例）
 ```
 
 ---
 
 ## 4. 当前运行状态 (Current Status)
 
-- **发文实测**：已在头条号实测正式上线 3 篇图文并茂长文，排在作品列表第 1 位；草稿箱成功留存 1 篇。
+- **发文实测**：已在头条号实测正式上线 4 篇图文并茂长文，排在作品列表第 1 位；草稿箱成功留存 1 篇。
 - **定时调度**：已挂载 AntiGravity 原生 Scheduled Tasks（Task ID `task-1210`），每日固定 09:00 与 15:00 自动唤醒并推送 3~5 套精选题卡。
-- **测试通过率**：`python -m pytest` 共 51 项测试用例全部通过（49 passed，2 skipped）。
+- **测试通过率**：`python -m pytest` 共 52 项测试用例全部通过（50 passed，2 skipped）。
 
 ---
 
 ## Zone B — Changelog Ledger
+
+### [v2.1] — 2026-09-05 22:30 | Session: S-20260905-2230
+**Summary**: 项目全量深度审查与工程优化：修复封面空插槽自愈逻辑退化，修正文章自动建目录格式与单测补齐，消除全库裸 except 与未用依赖，同步全套文档与发文资产。
+**Changes**:
+- 🐛 Fixed: `scripts/publisher.py` 恢复封面空插槽非空检查（`article-cover-add`）自愈逻辑，阻断富文本未能自动提取正文图时的发布拦截。
+- 🐛 Fixed: `scripts/pipeline.py` 修正 `prepare_article_directory` 中的月份目录格式为标准 `MM/DD`，增加 `base_dir` 测试隔离支持。
+- 🧪 Tests: `tests/test_pipeline.py` 扩充 `test_prepare_article_directory_structure` 目录结构与附件拷贝单测，测试套件扩增至 52 项（50 passed, 2 skipped）。
+- ♻️ Refactor: 修复 `browser_utils.py` 与 `publisher.py` 中的裸 `except:`，清理全仓库 8 处 unused imports 与冗余 f-strings。
+- 📄 Docs: 同步更新 `ReadMe.md`、`Handover Book.md`、`RESUME.md` 与 `docs/daily__pipeline_reviews/2026-09-05.md`，录入第 4 篇发文《取消英语主科，无异于自断一臂》。
+**Context**: 响应用户对项目进行全面审查并实施必要优化修复的指令。
 
 ### [v2.0] — 2026-09-05 14:15 | Session: S-20260905-1415
 **Summary**: 重大里程碑升级：从单点发文脚本全面演进为集热点嗅探雷达、STORM 深度调研、抗 AI 质检审计、封面自愈上传与定时调度于一体的头条全链路创作发布套件。

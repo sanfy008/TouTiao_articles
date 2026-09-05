@@ -608,7 +608,7 @@ def publish(
                             auth_manager.save_auth_state(context)
                             logged_in = True
                             break
-                    except:
+                    except Exception:
                         pass
                     time.sleep(1)
 
@@ -811,10 +811,17 @@ def publish(
                     take_screenshot("after_inline_images")
 
             # 3. Cover Image Processing
-            if cover_image_path and content_images:
-                print("🖼️ Article has inline images; skipping explicit cover upload (Toutiao auto-extracts cover).")
-
             need_cover_upload = should_upload_cover(cover_image_path, content_images)
+            if not need_cover_upload and cover_image_path:
+                try:
+                    add_cover_btn = page.locator("div.article-cover-add").first
+                    if add_cover_btn.is_visible():
+                        print("🖼️ Cover slot is empty; auto-healing by uploading cover image...")
+                        need_cover_upload = True
+                    else:
+                        print("🖼️ Article has inline images and cover is auto-extracted; skipping explicit upload.")
+                except Exception:
+                    pass
 
             if need_cover_upload:
                 print(f"🖼️ Uploading cover image: {cover_image_path}...")

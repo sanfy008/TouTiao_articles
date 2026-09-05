@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-import pytest
+import time
 from scripts.pipeline import ContentAuditor, prepare_article_directory
 
 
@@ -53,3 +52,32 @@ def test_auditor_hashtag_warning():
     passed, issues, _ = ContentAuditor.audit(title, text)
     assert passed is False
     assert any("## 话题" in i for i in issues)
+
+
+def test_prepare_article_directory_structure(tmp_path):
+    now = time.localtime()
+    expected_month = f"{now.tm_mon:02d}"
+    expected_day = f"{now.tm_mday:02d}"
+
+    title = "测试文章标题：如何过好这一生？"
+    content = "# 测试文章标题\n\n正文内容测试。"
+
+    # Create dummy cover image
+    dummy_cover = tmp_path / "dummy_cover.jpg"
+    dummy_cover.write_bytes(b"dummy image bytes")
+
+    target_dir = prepare_article_directory(
+        title=title,
+        content=content,
+        cover_source=str(dummy_cover),
+        base_dir=tmp_path / "articles",
+    )
+
+    assert target_dir.exists()
+    assert target_dir.parent.name == expected_day
+    assert target_dir.parent.parent.name == expected_month
+    assert (target_dir / "article.md").exists()
+    assert (target_dir / "article.md").read_text(encoding="utf-8") == content
+    assert (target_dir / "cover.jpg").exists()
+    assert (target_dir / "cover.jpg").read_bytes() == b"dummy image bytes"
+

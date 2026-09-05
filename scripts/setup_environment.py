@@ -73,7 +73,7 @@ class SkillEnvironment:
                 )
 
                 # Install requirements
-                result = subprocess.run(
+                subprocess.run(
                     [str(self.venv_pip), "install", "-r", str(self.requirements_file)],
                     check=True,
                     capture_output=True,
@@ -198,7 +198,7 @@ def main():
             print(f"   Python: {env.get_python_executable()}")
             print(f"   To activate manually: {env.activate_instructions()}")
         else:
-            print(f"❌ No virtual environment found")
+            print("❌ No virtual environment found")
             print("   Run: python3 scripts/setup_environment.py")
         return
 

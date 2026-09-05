@@ -5,7 +5,6 @@ Automatically scouts trends, filters out already published topics,
 runs deep research on the top candidates, and compiles 3-5 structured proposals.
 """
 
-import os
 import sys
 import json
 import time

@@ -6,13 +6,12 @@ Accepts user questions, social phenomena, or scraped trending topics,
 conducts multi-perspective inquiry, and synthesizes 3-5 structured topic proposal cards.
 """
 
-import os
 import sys
 import json
 import re
 import time
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 # Fix Windows console UTF-8 encoding
 if hasattr(sys.stdout, "reconfigure"):
@@ -122,7 +121,7 @@ class ResearchEngine:
                 "文末给出通透务实的生存法则（手握碎银，守住边界，不听虚话）"
             ],
             "target_words": "500-580字",
-            "visual_prompt": f"Chinese everyday realistic scene, documentary street photography, warm natural sunlight, authentic atmosphere, 16:9 widescreen, 4k cinematic",
+            "visual_prompt": "Chinese everyday realistic scene, documentary street photography, warm natural sunlight, authentic atmosphere, 16:9 widescreen, 4k cinematic",
             "tags": [f"#{t}#", "#生活感悟#", "#真实生活#", "#中老年生活#"]
         })
 
@@ -143,7 +142,7 @@ class ResearchEngine:
                 "收拢于‘向内求底气，向外守边界’的从容姿态"
             ],
             "target_words": "510-570字",
-            "visual_prompt": f"Elderly Chinese person sitting comfortably in a tranquil courtyard drinking tea, peaceful expression, soft afternoon golden hour light, 16:9 cinematic photography",
+            "visual_prompt": "Elderly Chinese person sitting comfortably in a tranquil courtyard drinking tea, peaceful expression, soft afternoon golden hour light, 16:9 cinematic photography",
             "tags": [f"#{t}#", "#人生感悟#", "#为人处世#", "#后半辈子#"]
         })
 
@@ -164,7 +163,7 @@ class ResearchEngine:
                 "结尾呼应家庭温暖、身体健康和内心的知足常乐"
             ],
             "target_words": "520-580字",
-            "visual_prompt": f"Warm bustling Chinese street market or cozy dinner table, steaming food, authentic human warmth, photorealistic, 16:9 cinematic composition",
+            "visual_prompt": "Warm bustling Chinese street market or cozy dinner table, steaming food, authentic human warmth, photorealistic, 16:9 cinematic composition",
             "tags": [f"#{t}#", "#百姓生活#", "#人间烟火#", "#家庭感悟#"]
         })
 
@@ -185,7 +184,7 @@ class ResearchEngine:
                 "文末抛出互动开放式问句，引导读者在评论区分享切身体会"
             ],
             "target_words": "530-590字",
-            "visual_prompt": f"Thoughtful Chinese middle-aged individual looking through a rain-streaked window or cafe window, reflective mood, 16:9 cinematic",
+            "visual_prompt": "Thoughtful Chinese middle-aged individual looking through a rain-streaked window or cafe window, reflective mood, 16:9 cinematic",
             "tags": [f"#{t}#", "#社会百态#", "#话题讨论#", "#今日深思#"]
         })
 
@@ -254,7 +253,7 @@ class ResearchEngine:
             lines.append(f"- **前3秒抓人黄金引子**：{prop['hook']}")
             lines.append(f"- **核心冲突**：{prop['conflict']}")
             lines.append(f"- **篇幅目标**：{prop['target_words']}")
-            lines.append(f"- **叙事脉络**：")
+            lines.append("- **叙事脉络**：")
             for step in prop["narrative_arc"]:
                 lines.append(f"  1. {step}")
             lines.append(f"- **推荐话题标签**：{' '.join(prop['tags'])}")

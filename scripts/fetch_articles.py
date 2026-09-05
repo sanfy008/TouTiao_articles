@@ -27,7 +27,7 @@ from patchright.sync_api import sync_playwright
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from config import DATA_DIR, BROWSER_PROFILE_DIR, STATE_FILE, BROWSER_ARGS
+from config import BROWSER_PROFILE_DIR, STATE_FILE
 from browser_utils import BrowserFactory
 
 ARTICLES_URL = "https://mp.toutiao.com/profile_v4/graphic/articles"

@@ -65,7 +65,7 @@ python manage.py setup
 # 验证登录态是否在线有效（访问头条受保护页面在线探活）
 python manage.py status --verify
 
-# 运行完整自动化测试套件（51 项单测全部绿灯）
+# 运行完整自动化测试套件（52 项单测全部绿灯）
 python -m pytest
 ```
 
