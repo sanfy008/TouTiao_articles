@@ -473,6 +473,12 @@ def detect_publish_success(page, timeout_seconds=15, poll_interval=0.5):
             except Exception:
                 continue
         if time.time() >= deadline:
+            try:
+                current_url = page.url or ""
+                if any(path in current_url for path in ("/manage/content", "/publish_success", "/manage/")):
+                    return f"页面已成功跳转至内容管理页: {current_url}"
+            except Exception:
+                pass
             return None
         time.sleep(poll_interval)
 
@@ -805,15 +811,10 @@ def publish(
                     take_screenshot("after_inline_images")
 
             # 3. Cover Image Processing
+            if cover_image_path and content_images:
+                print("🖼️ Article has inline images; skipping explicit cover upload (Toutiao auto-extracts cover).")
+
             need_cover_upload = should_upload_cover(cover_image_path, content_images)
-            if not need_cover_upload and cover_image_path:
-                try:
-                    add_cover_btn = page.locator("div.article-cover-add").first
-                    if add_cover_btn.is_visible():
-                        print("🖼️ Cover slot is empty; proceeding to upload cover image...")
-                        need_cover_upload = True
-                except Exception:
-                    pass
 
             if need_cover_upload:
                 print(f"🖼️ Uploading cover image: {cover_image_path}...")
@@ -883,7 +884,10 @@ def publish(
 
                 except Exception as e:
                     print(f"⚠️ Failed to upload cover: {e}")
-                    return PublishResult(False, "cover_upload_failed", str(e))
+                    if content_images:
+                        print("  ℹ️ Article already has inline images; continuing without explicit cover.")
+                    else:
+                        return PublishResult(False, "cover_upload_failed", str(e))
 
             elif no_cover:
                 print("🖼️ Selecting 'No Cover' (无封面) mode...")
