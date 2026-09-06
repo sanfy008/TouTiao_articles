@@ -946,28 +946,33 @@ def publish(
             if location:
                 try:
                     print(f"📍 Setting location to: {location}...")
-                    pos_input = page.locator("input[placeholder*='标记城市']").first
-                    if not pos_input.is_visible():
-                        pos_select = page.locator(".position-select, .byte-select").filter(has_text="标记城市").first
-                        if pos_select.is_visible():
-                            pos_select.click(force=True)
-                            time.sleep(0.5)
-                            pos_input = page.locator("input[placeholder*='标记城市']").first
+                    # Remove obstructing drawer masks injected by AI assistant
+                    try:
+                        page.evaluate("""() => {
+                            document.querySelectorAll('.ai-assistant-drawer, .byte-drawer-mask').forEach(el => el.remove());
+                        }""")
+                    except Exception:
+                        pass
 
-                    if pos_input.is_visible():
-                        pos_input.click(force=True)
-                        time.sleep(0.3)
-                        pos_input.fill(location)
-                        time.sleep(1.5)
-                        matched_opt = page.locator(".byte-select-option, li, div[role='option']").filter(has_text=location).first
-                        if matched_opt.is_visible():
-                            matched_opt.click(force=True)
-                            print(f"  ✅ Location selected: {location}")
+                    pos_select = page.locator(".position-select").first
+                    if pos_select.is_visible():
+                        pos_select.click(force=True)
+                        time.sleep(0.5)
+                        input_el = page.locator(".position-select input").first
+                        if input_el.is_visible():
+                            input_el.fill(location)
+                            time.sleep(1.2)
+                            opt = page.locator(".byte-select-option, li, div[role='option']").filter(has_text=location).first
+                            if opt.is_visible():
+                                opt.click(force=True)
+                                print(f"  ✅ Location selected: {location}")
+                            else:
+                                page.keyboard.press("Enter")
+                                print(f"  ✅ Location confirmed via Enter: {location}")
                         else:
-                            page.keyboard.press("Enter")
-                            print(f"  ✅ Location confirmed via Enter: {location}")
+                            print("  ⚠️ Location input field not active.")
                     else:
-                        print("  ⚠️ Could not find location input on page.")
+                        print("  ⚠️ Could not find .position-select on page.")
                 except Exception as e:
                     print(f"  ⚠️ Warning setting location: {e}")
 
