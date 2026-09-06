@@ -954,25 +954,35 @@ def publish(
                     except Exception:
                         pass
 
-                    pos_select = page.locator(".position-select").first
-                    if pos_select.is_visible():
-                        pos_select.click(force=True)
+                    # Target location selector input or select box
+                    loc_target = (
+                        page.locator("input[placeholder*='标记城市']")
+                        .or_(page.locator(".byte-select").filter(has_text="标记城市"))
+                        .or_(page.locator(".position-select"))
+                        .first
+                    )
+
+                    if loc_target.is_visible():
+                        loc_target.click(force=True)
                         time.sleep(0.5)
-                        input_el = page.locator(".position-select input").first
+                        # Type or fill location
+                        input_el = page.locator("input[placeholder*='标记城市']").or_(page.locator(".position-select input")).first
                         if input_el.is_visible():
                             input_el.fill(location)
-                            time.sleep(1.2)
-                            opt = page.locator(".byte-select-option, li, div[role='option']").filter(has_text=location).first
-                            if opt.is_visible():
-                                opt.click(force=True)
-                                print(f"  ✅ Location selected: {location}")
-                            else:
-                                page.keyboard.press("Enter")
-                                print(f"  ✅ Location confirmed via Enter: {location}")
                         else:
-                            print("  ⚠️ Location input field not active.")
+                            page.keyboard.type(location)
+                        time.sleep(1.2)
+
+                        # Select matching option from dropdown
+                        opt = page.locator(".byte-select-option, [role='option'], li").filter(has_text=location).first
+                        if opt.is_visible():
+                            opt.click(force=True)
+                            print(f"  ✅ Location selected from dropdown: {location}")
+                        else:
+                            page.keyboard.press("Enter")
+                            print(f"  ✅ Location confirmed via Enter: {location}")
                     else:
-                        print("  ⚠️ Could not find .position-select on page.")
+                        print("  ⚠️ Could not find location selector on page.")
                 except Exception as e:
                     print(f"  ⚠️ Warning setting location: {e}")
 
