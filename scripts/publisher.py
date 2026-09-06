@@ -35,7 +35,7 @@ os.environ.setdefault("TMP", str(TEMP_DIR))
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from config import PUBLISH_URL
+from config import PUBLISH_URL, DEFAULT_LOCATION
 from patchright.sync_api import sync_playwright
 from auth_manager import (
     AUTH_PROBE_INTERVAL_SECONDS,
@@ -511,7 +511,7 @@ def publish(
     debug_dir=None,
     event_callback=None,
     wait_seconds=None,
-    location=None,
+    location=DEFAULT_LOCATION,
     exclusive=True,
     claim="个人观点，仅供参考",
 ):
@@ -946,20 +946,28 @@ def publish(
             if location:
                 try:
                     print(f"📍 Setting location to: {location}...")
-                    pos_select = page.locator(".position-select").first
-                    if pos_select.is_visible():
-                        pos_select.click(force=True)
-                        time.sleep(0.5)
-                        input_el = pos_select.locator("input").first
-                        if input_el.is_visible():
-                            input_el.fill(location)
-                            time.sleep(1.5)
-                            matched_opt = page.locator(".byte-select-option, li").filter(has_text=location).first
-                            if matched_opt.is_visible():
-                                matched_opt.click(force=True)
-                                print(f"  ✅ Location selected: {location}")
-                            else:
-                                print(f"  ⚠️ No dropdown match for city: {location}")
+                    pos_input = page.locator("input[placeholder*='标记城市']").first
+                    if not pos_input.is_visible():
+                        pos_select = page.locator(".position-select, .byte-select").filter(has_text="标记城市").first
+                        if pos_select.is_visible():
+                            pos_select.click(force=True)
+                            time.sleep(0.5)
+                            pos_input = page.locator("input[placeholder*='标记城市']").first
+
+                    if pos_input.is_visible():
+                        pos_input.click(force=True)
+                        time.sleep(0.3)
+                        pos_input.fill(location)
+                        time.sleep(1.5)
+                        matched_opt = page.locator(".byte-select-option, li, div[role='option']").filter(has_text=location).first
+                        if matched_opt.is_visible():
+                            matched_opt.click(force=True)
+                            print(f"  ✅ Location selected: {location}")
+                        else:
+                            page.keyboard.press("Enter")
+                            print(f"  ✅ Location confirmed via Enter: {location}")
+                    else:
+                        print("  ⚠️ Could not find location input on page.")
                 except Exception as e:
                     print(f"  ⚠️ Warning setting location: {e}")
 
@@ -1223,7 +1231,13 @@ def main(argv=None):
     )
     parser.add_argument(
         "--location",
-        help="Tag city location for geo-targeted feed traffic (e.g. '广州')",
+        default=DEFAULT_LOCATION,
+        help=f"Tag city location for geo-targeted feed traffic (default: '{DEFAULT_LOCATION}')",
+    )
+    parser.add_argument(
+        "--no-location",
+        action="store_true",
+        help="Do not tag any city location",
     )
     parser.add_argument(
         "--exclusive",
@@ -1291,6 +1305,10 @@ def main(argv=None):
             emit_result(result)
             return EXIT_OK
 
+        target_location = None if args.no_location else (args.location or DEFAULT_LOCATION)
+        if target_location and str(target_location).lower() in ("none", "false", "0", ""):
+            target_location = None
+
         try:
             result = publish(
                 article=article,
@@ -1301,7 +1319,7 @@ def main(argv=None):
                 debug_dir=args.debug_dir,
                 event_callback=emit_result,
                 wait_seconds=args.wait_seconds,
-                location=args.location,
+                location=target_location,
                 exclusive=args.exclusive,
                 claim=args.claim,
             )

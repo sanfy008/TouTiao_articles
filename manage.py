@@ -23,6 +23,12 @@ os.environ["TEMP"] = str(TEMP_DIR)
 os.environ["TMP"] = str(TEMP_DIR)
 os.environ["PYTHONUTF8"] = "1"
 
+sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
+try:
+    from config import DEFAULT_LOCATION
+except ImportError:
+    DEFAULT_LOCATION = "广州"
+
 VENV_PYTHON = PROJECT_ROOT / ".venv" / "Scripts" / "python.exe"
 if not VENV_PYTHON.exists():
     VENV_PYTHON = PROJECT_ROOT / ".venv" / "bin" / "python"
@@ -129,8 +135,11 @@ def cmd_draft(args):
 
     if getattr(args, "wait", None) is not None:
         pub_args.extend(["--wait-seconds", str(args.wait)])
-    if getattr(args, "location", None):
-        pub_args.extend(["--location", str(args.location)])
+    loc = getattr(args, "location", DEFAULT_LOCATION)
+    if loc and str(loc).lower() not in ("none", "false", "0", ""):
+        pub_args.extend(["--location", str(loc)])
+    else:
+        pub_args.append("--no-location")
     if getattr(args, "exclusive", True) is False:
         pub_args.append("--no-exclusive")
     if getattr(args, "claim", None):
@@ -174,8 +183,11 @@ def cmd_publish(args):
     if cover_path:
         pub_args.extend(["--cover", str(Path(cover_path).resolve())])
 
-    if getattr(args, "location", None):
-        pub_args.extend(["--location", str(args.location)])
+    loc = getattr(args, "location", DEFAULT_LOCATION)
+    if loc and str(loc).lower() not in ("none", "false", "0", ""):
+        pub_args.extend(["--location", str(loc)])
+    else:
+        pub_args.append("--no-location")
     if getattr(args, "exclusive", True) is False:
         pub_args.append("--no-exclusive")
     if getattr(args, "claim", None):
@@ -285,7 +297,7 @@ def main():
     p_draft.add_argument("-f", "--file", required=True, help="Markdown 文章文件路径")
     p_draft.add_argument("-t", "--title", help="文章标题（2-30字，默认解析文章一级标题）")
     p_draft.add_argument("-c", "--cover", help="封面图片路径（可选，默认自动检测同目录下 cover.jpg/png）")
-    p_draft.add_argument("-l", "--location", help="发布地/城市标记（如 '广州'，获取同城流量）")
+    p_draft.add_argument("-l", "--location", default=DEFAULT_LOCATION, help=f"发布地/城市标记（默认: '{DEFAULT_LOCATION}'，获取同城流量）")
     p_draft.add_argument("--exclusive", action=argparse.BooleanOptionalAction, default=True, help="声明头条首发 (默认开启)")
     p_draft.add_argument("--claim", default="个人观点，仅供参考", help="作品声明 (默认: '个人观点，仅供参考')")
     p_draft.add_argument("--wait", type=int, help="自动保存草稿后等待关闭的秒数（留空则一直保留浏览器直到按 Ctrl+C）")
@@ -297,7 +309,7 @@ def main():
     p_pub.add_argument("-f", "--file", required=True, help="Markdown 文章文件路径")
     p_pub.add_argument("-t", "--title", help="文章标题（2-30字，默认解析文章一级标题）")
     p_pub.add_argument("-c", "--cover", help="封面图片路径（可选，默认自动检测同目录下 cover.jpg/png）")
-    p_pub.add_argument("-l", "--location", help="发布地/城市标记（如 '广州'，获取同城流量）")
+    p_pub.add_argument("-l", "--location", default=DEFAULT_LOCATION, help=f"发布地/城市标记（默认: '{DEFAULT_LOCATION}'，获取同城流量）")
     p_pub.add_argument("--exclusive", action=argparse.BooleanOptionalAction, default=True, help="声明头条首发 (默认开启)")
     p_pub.add_argument("--claim", default="个人观点，仅供参考", help="作品声明 (默认: '个人观点，仅供参考')")
     p_pub.add_argument("--headless", action="store_true", help="无头模式运行（静默后台）")
