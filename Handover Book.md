@@ -106,6 +106,12 @@
   - ❌ Alternatives: Windows 终端后台运行 `while True: sleep(3600)` 脚本（进程易挂起、重启丢失、不透明）。
   - 📌 Status: `Active`
 
+- **[DEC-006] 全面贯彻 OpenAI GPT-6 Astra 自然叙事与去 AI 腔协议** | Session: S-20260906-1630 | 2026-09-06
+  - 🔍 Context: 用户要求参考 OpenAI Astra 官方指南全面优化发文 Agent 风格，杜绝机械模板、列表符号与机器对仗，并要求控制段落长度以适应移动端阅读。
+  - ✅ Decision: 在全生命周期中建立 Astra 自然散文与反套话硬核防线：(1) 在 `research_engine.py` 扩充 `PLATITUDE_BLACKLIST` 严禁假大空修辞，调研事实清单注入 Astra 规范，选题库废除千篇一律的模板化钩子；(2) 在 `daily_scout.py` 实施候选方案跨视角轮转，避免每日雷达视角单一；(3) 在 `pipeline.py`（`ContentAuditor`）新增 `MAX_PARAGRAPH_CHARS = 110`、列表符号零容忍（Zero Bullet Points）、手机端段落节奏（50-80字）及机械对仗密度（≤2处）断言；(4) 同步将协议固化至 `SKILL.md` 并扩增单测。
+  - ❌ Alternatives: 仅依靠 Prompt 口头约束（模型容易复发产生列表符或长段落）或机械截断（破坏逻辑完整性）。
+  - 📌 Status: `Active`
+
 ### B2. 🎨 Style DNA（用户画像 & 偏好档案）
 - `[S-20260904]` 绝对禁止在 C 盘生成大量临时文件和缓存，开发环境与浏览器数据必须严格隔离于 D 盘。
 - `[S-20260905]` 文章篇幅严格控制在 500 字左右（纯汉字 480-620 区间），生活哲理感悟类风格，接地气、见生活。
@@ -113,6 +119,8 @@
 - `[S-20260905]` 话题标签必须干净纯粹，禁止带“话题：”三字前缀，禁止呈现为大标题红杠样式。
 - `[S-20260905]` 交付物输出必须完整严密，绝对禁止占位符（“中间省略”等），杜绝 AI 腔空话套话。
 - `[S-20260905]` 代码演进与流程固化必须同步闭环至项目根目录 `SKILL.md`，严禁交付物与技能契约脱节。
+- `[S-20260906-ASTRA-confirmed]` 行文严格遵循 GPT-6 Astra 自然散文规范：短段落（50-80 字，上限 110 字），严禁列表符号（Zero Bullet Points），严禁机械对仗（“不是...而是/不仅...更是”），杜绝空洞总结套话，语言自然平实如日常交谈。
+- `[S-20260906-GEO-confirmed]` 头条发文固定勾选广州市地理位置，并通过 DOM 清理移除字节跳动全屏透明遮罩防止拦截。
 
 ### B3. ❌ Failed Attempts Archive（失败档案）
 
@@ -135,6 +143,16 @@
   - 🔧 Approach: 经过数轮流水线演进落地了热点雷达、STORM 调研引擎、质检审计器与定时调度，但在收尾复盘并 pushgit 时，只更新了 ReadMe.md、Handover Book.md 与 docs/，未同步更新根目录下的 `SKILL.md`。
   - 💥 Failure Reason: 认知断层与资产盘点盲区——误以为编写完底层 Python 脚本即完成了“固化为 Skill”，且 project-save 默认 scope 未显式约束“当项目本身作为 Skill 时必须同步更新工作区根目录的 SKILL.md”，导致 push 到 GitHub 的仍然是旧版单点发布器的 SKILL.md。
   - 💡 Lesson: 当项目本身即为 Skill 时，根目录下的 `SKILL.md` 与 `ReadMe.md` 具有同等核心地位；在代码演进、多模块落地或收尾 save 时，必须将 `SKILL.md` 列入强制同步审计清单。
+
+- **[FAIL-005] 字节跳动 AI 创作助手全屏透明蒙层阻断地理位置选择** | Session: S-20260906-1630 | 2026-09-06
+  - 🔧 Approach: 直接调用 Playwright 探测并点击 `.position-select` 元素。
+  - 💥 Failure Reason: 页面注入了 `ai-assistant-drawer` 和全屏透明遮罩 `byte-drawer-mask`，拦截了对地理位置选择框的指针事件。
+  - 💡 Lesson: 在选择地理位置或表单交互前，必须先在 DOM 中主动清理 `.ai-assistant-drawer, .byte-drawer-mask`。
+
+- **[FAIL-006] 机械对仗正则排除逗号导致自然句式漏检** | Session: S-20260906-1630 | 2026-09-06
+  - 🔧 Approach: 使用 `[^，。！？\n]{2,20}` 匹配“不是...而是”。
+  - 💥 Failure Reason: 中文书写中“不是”和“而是”之间通常带有逗号（如“这不是偶然，而是必然”），负向字符集排除逗号导致实际对仗句被漏检。
+  - 💡 Lesson: 改为允许句内逗号并放宽长度 `(?:不是[^。！？\n]{1,25}[，, ]*而是|不仅[^。！？\n]{1,25}[，, ]*更是|表面上[^。！？\n]{1,25}[，, ]*实际上)`。
 
 ### B4. 🏗️ Technical Debt Register（技术债务台账）
 

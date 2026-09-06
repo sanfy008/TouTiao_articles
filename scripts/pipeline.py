@@ -37,6 +37,7 @@ class ContentAuditor:
 
     MIN_WORDS = 480
     MAX_WORDS = 620
+    MAX_PARAGRAPH_CHARS = 110
 
     @classmethod
     def audit(cls, title: str, content: str) -> Tuple[bool, List[str], Dict[str, Any]]:
@@ -108,9 +109,39 @@ class ContentAuditor:
         if "话题：" in content or "话题:" in content:
             issues.append("文末包含冗余的 '话题：' 前缀，必须剔除")
 
+        # 5. Astra Prose Check: Reject Bullet Points
+        for line in body.splitlines():
+            line_str = line.strip()
+            if not line_str.startswith("#") and not line_str.startswith("![") and not line_str.startswith("---"):
+                if re.match(r"^[-*•]\s+", line_str) or re.match(r"^\d+[\.、]\s+", line_str):
+                    issues.append("包含列表项目符号 (bullet points)，违反 GPT-6 Astra 纯散文自然叙述规范，请改用自然段落")
+                    break
+
+        # 6. Astra Mobile Rhythm: Short Paragraph Check (50-80 target, max 110)
+        paragraphs = [p.strip() for p in body_no_tags.splitlines() if p.strip() and not p.strip().startswith("![") and not p.strip().startswith("---")]
+        if len(paragraphs) > 1:
+            long_paras = []
+            for idx, p in enumerate(paragraphs, 1):
+                p_chars = len(re.findall(r"[\u4e00-\u9fa5]", p))
+                if p_chars > cls.MAX_PARAGRAPH_CHARS:
+                    long_paras.append((idx, p_chars))
+            if long_paras:
+                issues.append(
+                    f"存在段落过长（第 {[lp[0] for lp in long_paras]} 段纯汉字最高达 {max(lp[1] for lp in long_paras)} 字），不利于手机端阅读（建议单段控制在 50-80 字，上限 {cls.MAX_PARAGRAPH_CHARS} 字）"
+                )
+
+        # 7. Astra Anti-Slop: Overuse of mechanical contrastive framing ('不是...而是...', '不仅...更是...')
+        contrastive_matches = re.findall(
+            r"(?:不是[^。！？\n]{1,25}[，, ]*而是|不仅[^。！？\n]{1,25}[，, ]*更是|表面上[^。！？\n]{1,25}[，, ]*实际上)",
+            body,
+        )
+        if len(contrastive_matches) > 2:
+            issues.append(f"包含过多机械对仗 AI 腔（检测到 {len(contrastive_matches)} 处‘不是...而是/不仅...更是’，建议改用直接动词陈述）")
+
         metrics = {
             "char_count": char_count,
             "title_length": len(title),
+            "paragraph_count": len(paragraphs),
             "passed": len(issues) == 0
         }
         return len(issues) == 0, issues, metrics

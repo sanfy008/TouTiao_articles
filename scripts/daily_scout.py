@@ -74,14 +74,14 @@ def generate_daily_radar(limit_scout: int = 10, top_proposals: int = 4) -> Dict[
         candidates = hotspots[:top_proposals]
 
     proposals_pool = []
-    for cand in candidates:
+    for idx, cand in enumerate(candidates):
         topic_text = cand["tag"]
         engine = ResearchEngine(topic_text)
         research_res = engine.run_full_research()
         props = research_res.get("proposals", [])
         if props:
-            # Pick the most resonant proposal from each candidate
-            best_prop = props[0]
+            # Rotate perspectives across candidates for natural thematic diversity
+            best_prop = props[idx % len(props)]
             best_prop["source_tag"] = topic_text
             best_prop["reads"] = cand.get("reads", "0")
             best_prop["discussions"] = cand.get("discussions", "0")

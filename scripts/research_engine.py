@@ -66,6 +66,14 @@ class ResearchEngine:
         "唯有...才能...",
         "让我们一起努力",
         "无论如何",
+        "值得我们深思",
+        "不可否认",
+        "毋庸置疑",
+        "显而易见",
+        "不言而喻",
+        "归根结底",
+        "说到底",
+        "耐人寻味",
     ]
 
     def __init__(self, topic_or_phenomenon: str):
@@ -92,8 +100,8 @@ class ResearchEngine:
         """
         Synthesize 3-5 structured topic cards.
         Adheres to Toutiao short essay formula:
-        - 22-28 chars high-CTR title
-        - 500-600 characters target length
+        - 16-26 chars high-CTR punchy title
+        - 480-600 characters target length
         - Immediate relatable hook
         - Concrete contrasting vignette
         - Grounded conclusion
@@ -105,24 +113,24 @@ class ResearchEngine:
         proposals = []
 
         # Proposal 1: The Hardcore Reality / Economic Angle
-        p1_title = f"{t}？算完这笔扎心账，我彻底清醒了"
-        if len(p1_title) > 28:
-            p1_title = f"{t[:18]}？算完这笔账我清醒了"
+        p1_title = f"{t}背后，到底藏着多少普通人的代价？"
+        if len(p1_title) > 26:
+            p1_title = f"{t[:16]}：普通人该算清这笔账了"
         proposals.append({
             "id": 1,
             "title": p1_title,
             "angle_type": "现实账本型（理智扎心）",
-            "hook": f"身边总有人在争论‘{t}’，但大多数人算错了账，把面子当成了底气，直到摔了跟头才发现生活的残酷。",
-            "conflict": "面子消费与人情绑架 vs 真实钱包厚度与抗风险能力",
+            "hook": f"关于‘{t}’，很多人只看到了表面上的热闹，却很少有人真正静下心来，算清楚普通人为此承受的真实成本。",
+            "conflict": "虚荣面子与随大流消费 vs 真实抗风险底气与生活承受力",
             "narrative_arc": [
-                "开头用生活反常现象抛出疑问，迅速吸引中老年及家庭决策者视线",
-                "正文列举身边真实现象（柴米油盐、人情往来、生病用钱时的残酷对比）",
-                "剖析普通人最容易踩的自我感动误区",
-                "文末给出通透务实的生存法则（手握碎银，守住边界，不听虚话）"
+                "开头用具体生活账目抛出疑问，迅速吸引中老年及家庭决策者视线",
+                "正文列举身边真实现象（柴米油盐、人情往来、失业或生病时的残酷现实）",
+                "剖析普通人最容易踩的盲目跟风误区",
+                "文末给出通透务实的生存法则（手握余粮，守住边界，不听虚名）"
             ],
             "target_words": "500-580字",
             "visual_prompt": "Chinese everyday realistic scene, documentary street photography, warm natural sunlight, authentic atmosphere, 16:9 widescreen, 4k cinematic",
-            "tags": [f"#{t}#", "#生活感悟#", "#真实生活#", "#中老年生活#"]
+            "tags": [f"#{t}#", "#生活感悟#", "#真实生活#", "#现实账本#"]
         })
 
         # Proposal 2: The Emotional Independence / Counter-Intuitive Angle
@@ -198,11 +206,14 @@ class ResearchEngine:
             "target_audience": "头条主力读者（35-65岁关注家庭、民生、养老、生活感悟的务实群体）",
             "reading_scenario": "碎片化刷手机、通勤或睡前浏览，要求前3行必须入题，不废话",
             "style_rules": [
-                "篇幅严格控制在 500-600 字（完读率峰值区间）",
-                "语言大白话，充满口语化叙事与市井烟火气",
-                "严禁悬浮 AI 腔，严禁出现'在这个快节奏的时代'、'综上所述'",
-                "逻辑严密闭环（如提倡几点必须数字与内容精确对应）",
-                "文末标签使用纯净 <p>#标签1# #标签2#</p>，不带'话题：'前缀，不带Markdown标题样式"
+                "篇幅严格控制在 480-600 纯汉字（头条黄金完读率区间）",
+                "短段落呼吸感：通篇 6-8 个紧凑自然段，单段严格控制在 50-80 字，适应手机屏幕阅读",
+                "坚决弃用列表项目符号（Zero Bullet Points），全篇采用流畅自然的散文叙述收束",
+                "禁绝机械二元对仗（如滥用'不是...而是...'、'不仅是...更是...'），直接用实在动词陈述事实",
+                "禁绝罐头总结（如'总而言之'、'说到底'、'值得我们深思'），事实点透即止，不灌说教鸡汤",
+                "禁绝自问自答舞台剧腔，语言大白话，充满口语化叙事与市井生活烟火气",
+                "承诺数字严密闭环（如标题承诺数字必须与正文内容 1:1 精确对应）",
+                "文末标签使用纯净段落，不带'话题：'前缀，不带 Markdown 标题红杠样式"
             ],
             "platitude_blacklist": self.PLATITUDE_BLACKLIST
         }
