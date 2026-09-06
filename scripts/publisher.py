@@ -443,7 +443,7 @@ def should_upload_cover(cover_image_path=None, content_images=None):
     return bool(cover_image_path) and not bool(content_images)
 
 
-def detect_publish_success(page, timeout_seconds=15, poll_interval=0.5):
+def detect_publish_success(page, timeout_seconds=30, poll_interval=0.5):
     success_selectors = (
         ".byte-message-success",
         ".byte-notification-success",
@@ -811,17 +811,10 @@ def publish(
                     take_screenshot("after_inline_images")
 
             # 3. Cover Image Processing
+            if cover_image_path and content_images:
+                print("🖼️ Article has inline images; skipping explicit cover upload (Toutiao auto-extracts cover).")
+
             need_cover_upload = should_upload_cover(cover_image_path, content_images)
-            if not need_cover_upload and cover_image_path:
-                try:
-                    add_cover_btn = page.locator("div.article-cover-add").first
-                    if add_cover_btn.is_visible():
-                        print("🖼️ Cover slot is empty; auto-healing by uploading cover image...")
-                        need_cover_upload = True
-                    else:
-                        print("🖼️ Article has inline images and cover is auto-extracted; skipping explicit upload.")
-                except Exception:
-                    pass
 
             if need_cover_upload:
                 print(f"🖼️ Uploading cover image: {cover_image_path}...")
@@ -891,6 +884,14 @@ def publish(
 
                 except Exception as e:
                     print(f"⚠️ Failed to upload cover: {e}")
+                    try:
+                        page.keyboard.press("Escape")
+                        time.sleep(0.5)
+                        close_btn = page.locator(".byte-modal-close, .modal-close, button[aria-label='Close']").first
+                        if close_btn.is_visible():
+                            close_btn.click()
+                    except Exception:
+                        pass
                     if content_images:
                         print("  ℹ️ Article already has inline images; continuing without explicit cover.")
                     else:
